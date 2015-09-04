@@ -2,6 +2,7 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
+import org.craftedsw.tripservicekata.user.UserSession;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +11,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TripServiceTest {
 
@@ -45,6 +48,14 @@ public class TripServiceTest {
         assertThat(service.getTripsByUser(user), is(Arrays.asList(trip)));
     }
 
+    @Test
+    public void collaborations() {
+        LoggedUserService loggedUserService = mock(LoggedUserService.class);
+        when(loggedUserService.getLoggedUser()).thenReturn(loggedUser);
+        TripService collaborationsService = new TripServiceFake(loggedUserService);
+        assertThat(collaborationsService.getTripsByUser(user), is(Arrays.asList()));
+    }
+
     public class TripServiceFake extends TripService {
 
         private User user;
@@ -57,6 +68,10 @@ public class TripServiceTest {
             this.user = user;
         }
 
+        public TripServiceFake(LoggedUserService loggedUserService) {
+            this.user = loggedUserService.getLoggedUser();
+        }
+
         @Override
         protected User getLoggedUser() {
             return user;
@@ -67,5 +82,12 @@ public class TripServiceTest {
             return user.trips();
         }
     }
-	
+
+    private class LoggedUserService {
+
+        public User getLoggedUser() {
+            return UserSession.getInstance().getLoggedUser();
+        }
+
+    }
 }
