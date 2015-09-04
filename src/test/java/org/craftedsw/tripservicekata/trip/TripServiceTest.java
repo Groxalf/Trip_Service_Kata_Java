@@ -2,6 +2,7 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -12,30 +13,36 @@ import static org.junit.Assert.assertThat;
 
 public class TripServiceTest {
 
+    private TripService service;
+    private User user;
+    private User loggedUser;
+    private Trip trip;
+
+    @Before
+    public void setUp() throws Exception {
+        user = new User();
+        loggedUser = new User();
+        trip = new Trip();
+        service = new TripServiceFake(loggedUser);
+    }
+
     @Test(expected = UserNotLoggedInException.class)
     public void should_raise_an_exception_when_user_is_not_logged() throws Exception {
-        TripService service = new TripServiceFake();
-        service.getTripsByUser((User) new User());
+        TripServiceFake notLoggedUserService = new TripServiceFake();
+        notLoggedUserService.getTripsByUser(user);
     }
 
     @Test
     public void should_return_empty_trip_list_when_loggedUser_is_not_a_friend_of_user() {
-        User user = new User();
-        User loggedUser = new User();
-        TripService service = new TripServiceFake(loggedUser);
-        assertThat(service.getTripsByUser((User) user), is(Arrays.asList()));
+        assertThat(service.getTripsByUser(user), is(Arrays.asList()));
     }
 
 
     @Test
     public void should_return_list_with_the_trips_of_user_when_is_friend_of_loggedUser() {
-        User user = new User();
-        User loggedUser = new User();
-        Trip trip = new Trip();
         user.addFriend(loggedUser);
         user.addTrip(trip);
-        TripServiceFake serviceFake = new TripServiceFake(loggedUser);
-        assertThat(serviceFake.getTripsByUser(user), is(Arrays.asList(trip)));
+        assertThat(service.getTripsByUser(user), is(Arrays.asList(trip)));
     }
 
     public class TripServiceFake extends TripService {
