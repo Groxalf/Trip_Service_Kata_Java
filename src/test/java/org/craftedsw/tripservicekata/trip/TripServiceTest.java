@@ -52,12 +52,16 @@ public class TripServiceTest {
     public void collaborations() {
         LoggedUserService loggedUserService = mock(LoggedUserService.class);
         when(loggedUserService.getLoggedUser()).thenReturn(loggedUser);
-        TripService collaborationsService = new TripServiceFake(loggedUserService);
-        assertThat(collaborationsService.getTripsByUser(user), is(Arrays.asList()));
+        TripsUserRepository tripsUserRepository = mock(TripsUserRepository.class);
+        when(tripsUserRepository.getTripsOf(user)).thenReturn(Arrays.asList(trip));
+        user.addFriend(loggedUser);
+        TripService collaborationsService = new TripServiceFake(loggedUserService, tripsUserRepository);
+        assertThat(collaborationsService.getTripsByUser(user), is(Arrays.asList(trip)));
     }
 
     public class TripServiceFake extends TripService {
 
+        private TripsUserRepository tripsUserRepository;
         private User user;
 
         public TripServiceFake () {
@@ -68,8 +72,9 @@ public class TripServiceTest {
             this.user = user;
         }
 
-        public TripServiceFake(LoggedUserService loggedUserService) {
+        public TripServiceFake(LoggedUserService loggedUserService, TripsUserRepository tripsUserRepository) {
             this.user = loggedUserService.getLoggedUser();
+            this.tripsUserRepository = tripsUserRepository;
         }
 
         @Override
@@ -79,7 +84,8 @@ public class TripServiceTest {
 
         @Override
         protected List<Trip> getTripsOf(User user) {
-            return user.trips();
+            if (tripsUserRepository == null) return user.trips();
+            return tripsUserRepository.getTripsOf(user);
         }
     }
 
@@ -87,6 +93,14 @@ public class TripServiceTest {
 
         public User getLoggedUser() {
             return UserSession.getInstance().getLoggedUser();
+        }
+
+    }
+
+    private class TripsUserRepository {
+
+        public List<Trip> getTripsOf(User user) {
+            return TripDAO.findTripsByUser(user);
         }
 
     }
