@@ -1,7 +1,7 @@
 package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
-import org.craftedsw.tripservicekata.user.LoggedUserService;
+import org.craftedsw.tripservicekata.user.UserSessionService;
 import org.craftedsw.tripservicekata.user.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class TripServiceTest {
     private User user;
     private User loggedUser;
     private TripsUserRepository tripsUserRepository;
-    private LoggedUserService loggedUserService;
+    private UserSessionService userSessionService;
     private Trip trip;
 
     @Before
@@ -29,9 +29,9 @@ public class TripServiceTest {
         loggedUser = new User();
         user = new User();
         trip = new Trip();
-        loggedUserService = mock(LoggedUserService.class);
+        userSessionService = mock(UserSessionService.class);
         tripsUserRepository = mock(TripsUserRepository.class);
-        service = new TripService(loggedUserService, tripsUserRepository);
+        service = new TripService(userSessionService, tripsUserRepository);
     }
 
     @Test(expected = UserNotLoggedInException.class)
@@ -56,12 +56,12 @@ public class TripServiceTest {
     }
 
     private void GivenALoggedUser(User user) {
-        when(loggedUserService.getLoggedUser()).thenReturn(user);
+        when(userSessionService.getLoggedUser()).thenReturn(user);
     }
 
 
     private void GivenANotLoggedUser() {
-        when(loggedUserService.getLoggedUser()).thenThrow(new UserNotLoggedInException());
+        when(userSessionService.getLoggedUser()).thenThrow(new UserNotLoggedInException());
     }
 
     private void GivenUserWhoIsNotFriendOfLoggedUser() {
