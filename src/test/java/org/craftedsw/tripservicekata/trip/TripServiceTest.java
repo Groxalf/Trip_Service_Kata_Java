@@ -43,7 +43,7 @@ public class TripServiceTest {
     @Test
     public void should_return_empty_trip_list_when_loggedUser_is_not_a_friend_of_user() {
         GivenALoggedUser(loggedUser);
-        when(tripsUserRepository.getTripsOf(user)).thenReturn(new ArrayList<>());
+        GivenUserWhoIsNotFriendOfLoggedUser();
         assertThat(service.getTripsByUser(user), is(Arrays.asList()));
     }
 
@@ -55,13 +55,17 @@ public class TripServiceTest {
         assertThat(service.getTripsByUser(user), is(Arrays.asList(trip)));
     }
 
-
     private void GivenALoggedUser(User user) {
         when(loggedUserService.getLoggedUser()).thenReturn(user);
     }
 
+
     private void GivenANotLoggedUser() {
         when(loggedUserService.getLoggedUser()).thenThrow(new UserNotLoggedInException());
+    }
+
+    private void GivenUserWhoIsNotFriendOfLoggedUser() {
+        when(tripsUserRepository.getTripsOf(user)).thenReturn(new ArrayList<>());
     }
 
     private void GivenAUserFriendOfLoggedUserWithTrips(List<Trip> trips) {
