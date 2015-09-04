@@ -18,21 +18,8 @@ public class TripService {
     }
 
     public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
-        User loggedUser = getLoggedUser();
-        if (loggedUser == null) {
-            throw new UserNotLoggedInException();
-        }
-        if (user.isFriendOf(loggedUser)) return getTripsOf(user);
+        if (user.isFriendOf(loggedUserService.getLoggedUser())) return tripsUserRepository.getTripsOf(user);
         return new ArrayList<>();
-
-    }
-
-    protected List<Trip> getTripsOf(User user) {
-        return tripsUserRepository.getTripsOf(user);
-    }
-
-    protected User getLoggedUser() {
-        return loggedUserService.getLoggedUser();
     }
 
 }

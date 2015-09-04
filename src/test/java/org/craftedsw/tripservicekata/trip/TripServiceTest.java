@@ -20,13 +20,12 @@ public class TripServiceTest {
     private User user;
     private User loggedUser;
     private TripsUserRepository tripsUserRepository;
-    private LoggedUserService loggedUserService;
 
     @Before
     public void setUp() throws Exception {
         loggedUser = new User();
         user = new User();
-        loggedUserService = mock(LoggedUserService.class);
+        LoggedUserService loggedUserService = mock(LoggedUserService.class);
         when(loggedUserService.getLoggedUser()).thenReturn(loggedUser);
         tripsUserRepository = mock(TripsUserRepository.class);
         service = new TripService(loggedUserService, tripsUserRepository);
@@ -35,7 +34,7 @@ public class TripServiceTest {
     @Test(expected = UserNotLoggedInException.class)
     public void should_raise_an_exception_when_user_is_not_logged() throws Exception {
         LoggedUserService notLoggedUserService = mock(LoggedUserService.class);
-        when(notLoggedUserService.getLoggedUser()).thenReturn(null);
+        when(notLoggedUserService.getLoggedUser()).thenThrow(new UserNotLoggedInException());
         TripService tripService = new TripService(notLoggedUserService, tripsUserRepository);
         tripService.getTripsByUser(user);
     }
@@ -54,19 +53,6 @@ public class TripServiceTest {
         user.addTrip(trip);
         when(tripsUserRepository.getTripsOf(user)).thenReturn(Arrays.asList(trip));
         assertThat(service.getTripsByUser(user), is(Arrays.asList(trip)));
-    }
-
-    @Test
-    public void collaborations() {
-        Trip trip = new Trip();
-        LoggedUserService loggedUserService = mock(LoggedUserService.class);
-        when(loggedUserService.getLoggedUser()).thenReturn(loggedUser);
-        TripsUserRepository tripsUserRepository = mock(TripsUserRepository.class);
-        when(tripsUserRepository.getTripsOf(user)).thenReturn(Arrays.asList(trip));
-        user.addFriend(loggedUser);
-        user.addTrip(trip);
-        TripService collaborationsService = new TripService(loggedUserService, tripsUserRepository);
-        assertThat(collaborationsService.getTripsByUser(user), is(Arrays.asList(trip)));
     }
 
 }
