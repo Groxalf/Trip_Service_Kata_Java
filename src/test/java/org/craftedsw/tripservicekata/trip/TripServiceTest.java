@@ -1,8 +1,8 @@
 package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
+import org.craftedsw.tripservicekata.user.LoggedUserService;
 import org.craftedsw.tripservicekata.user.User;
-import org.craftedsw.tripservicekata.user.UserSession;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -89,19 +89,4 @@ public class TripServiceTest {
         }
     }
 
-    private class LoggedUserService {
-
-        public User getLoggedUser() {
-            return UserSession.getInstance().getLoggedUser();
-        }
-
-    }
-
-    private class TripsUserRepository {
-
-        public List<Trip> getTripsOf(User user) {
-            return TripDAO.findTripsByUser(user);
-        }
-
-    }
 }
