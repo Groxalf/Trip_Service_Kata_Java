@@ -27,11 +27,7 @@ public class User {
 	}
 
     public boolean isFriendOf(User loggedUser) {
-        for (User friend : getFriends()) {
-            if (friend.equals(loggedUser)) {
-                return true;
-            }
-        }
-        return false;
+        return friends.stream()
+                      .anyMatch(friend -> friend.equals(loggedUser));
     }
 }
